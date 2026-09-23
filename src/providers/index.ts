@@ -5,18 +5,20 @@ import { createOpenAIProvider } from "./openai.js";
 import type { ItineraryProvider } from "./types.js";
 
 export type { ItineraryProvider, ItineraryProviderGenerateArgs } from "./types.js";
+export { extractJson } from "./types.js";
 
 export function getProvider(
   provider: PlanTripProviderName,
   apiKey: string,
+  model?: string,
 ): ItineraryProvider {
   switch (provider) {
     case "openai":
-      return createOpenAIProvider(apiKey);
+      return createOpenAIProvider(apiKey, model);
     case "anthropic":
-      return createAnthropicProvider(apiKey);
+      return createAnthropicProvider(apiKey, model);
     case "gemini":
-      return createGeminiProvider(apiKey);
+      return createGeminiProvider(apiKey, model);
     default: {
       const _exhaustive: never = provider;
       throw new Error(`Unsupported provider: ${_exhaustive}`);

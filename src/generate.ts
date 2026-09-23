@@ -1,11 +1,28 @@
+import { ZodError } from "zod";
 import { readPlanTripEnv } from "./env.js";
+import { buildUserPrompt, schemaDescription, SYSTEM_PROMPT } from "./prompt.js";
 import { getProvider } from "./providers/index.js";
 import { tripInputSchema, type TripInput } from "./schema/input.js";
-import type { TripPlans } from "./schema/output.js";
+import { tripPlansJsonSchema } from "./schema/json-schema.js";
+import { tripPlansSchema, type TripPlans } from "./schema/output.js";
+
+const MAX_ATTEMPTS = 2;
+
+function formatZodError(error: ZodError): string {
+  return error.issues
+    .map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`)
+    .join("; ");
+}
+
+function clampPlans(plans: TripPlans, planCount: number): TripPlans {
+  return {
+    plans: plans.plans.slice(0, planCount),
+  };
+}
 
 /**
- * Validates trip input, reads env (provider, key, max plans), clamps planCount,
- * and selects the provider. Model generation is not implemented in setup.
+ * Validates trip input, calls the configured AI provider, and returns
+ * structured itinerary plans. Retries once if the model JSON fails Zod validation.
  */
 export async function generateItinerary(
   input: TripInput,
@@ -14,11 +31,36 @@ export async function generateItinerary(
   const env = readPlanTripEnv();
   const requested = parsed.planCount ?? env.maxPlans;
   const planCount = Math.min(requested, env.maxPlans);
+  const provider = getProvider(env.provider, env.apiKey, env.model);
+  const description = schemaDescription();
 
-  // Ensure the configured provider can be selected with the given key.
-  getProvider(env.provider, env.apiKey);
+  let repairHint: string | undefined;
+  let lastError: Error | undefined;
 
-  throw new Error(
-    `plan-trip setup is ready (provider "${env.provider}", planCount ${planCount}). Model generation is not implemented yet.`,
-  );
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const user = buildUserPrompt({
+      trip: parsed,
+      planCount,
+      schemaDescription: description,
+      repairHint,
+    });
+
+    const raw = await provider.generate({
+      system: SYSTEM_PROMPT,
+      user,
+      schema: tripPlansJsonSchema,
+    });
+
+    const result = tripPlansSchema.safeParse(raw);
+    if (result.success) {
+      return clampPlans(result.data, planCount);
+    }
+
+    lastError = new Error(
+      `Invalid itinerary JSON from ${provider.name}: ${formatZodError(result.error)}`,
+    );
+    repairHint = formatZodError(result.error);
+  }
+
+  throw lastError ?? new Error("Failed to generate a valid itinerary.");
 }

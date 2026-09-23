@@ -9,6 +9,7 @@ export {
 
 export {
   getProvider,
+  extractJson,
   type ItineraryProvider,
   type ItineraryProviderGenerateArgs,
 } from "./providers/index.js";
@@ -39,3 +40,5 @@ export {
   type BlockKind,
   type BlockTransport,
 } from "./schema/output.js";
+
+export { tripPlansJsonSchema } from "./schema/json-schema.js";

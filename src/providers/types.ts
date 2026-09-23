@@ -1,6 +1,7 @@
 export type ItineraryProviderGenerateArgs = {
-  prompt: string;
-  /** JSON Schema or provider-specific schema description for structured output. */
+  system: string;
+  user: string;
+  /** JSON Schema object for providers that support structured output. */
   schema: unknown;
 };
 
@@ -8,3 +9,21 @@ export type ItineraryProvider = {
   readonly name: string;
   generate(args: ItineraryProviderGenerateArgs): Promise<unknown>;
 };
+
+export function extractJson(text: string): unknown {
+  const trimmed = text.trim();
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fenced?.[1]) {
+      return JSON.parse(fenced[1].trim());
+    }
+    const start = trimmed.indexOf("{");
+    const end = trimmed.lastIndexOf("}");
+    if (start >= 0 && end > start) {
+      return JSON.parse(trimmed.slice(start, end + 1));
+    }
+    throw new Error("Model response did not contain valid JSON.");
+  }
+}

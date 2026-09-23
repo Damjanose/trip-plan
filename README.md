@@ -2,10 +2,6 @@
 
 TypeScript library that turns a fixed trip request into structured itinerary plans. Another project imports this package; there is no HTTP API and no UI.
 
-## Setup status
-
-This release scaffolds the contract only: env vars, Zod input/output schemas, provider stubs, and `generateItinerary`. Model calls are not implemented yet.
-
 ## Environment
 
 Copy `.env.example` and set values in the process that imports this package:
@@ -15,6 +11,13 @@ Copy `.env.example` and set values in the process that imports this package:
 | `PLAN_TRIP_PROVIDER` | yes | `openai`, `anthropic`, or `gemini` |
 | `PLAN_TRIP_API_KEY` | yes | API key for the chosen provider |
 | `PLAN_TRIP_MAX_PLANS` | no | Cap on how many plans can be requested (default `3`) |
+| `PLAN_TRIP_MODEL` | no | Model override for the selected provider |
+
+Defaults when `PLAN_TRIP_MODEL` is unset:
+
+- OpenAI: `gpt-4o-mini`
+- Anthropic: `claude-sonnet-4-20250514`
+- Gemini: `gemini-2.0-flash`
 
 `planCount` on the input cannot exceed `PLAN_TRIP_MAX_PLANS`.
 
@@ -39,11 +42,11 @@ const plans = await generateItinerary({
 });
 ```
 
-During setup, `generateItinerary` validates the input, checks the env, clamps `planCount`, selects the provider, then throws until model generation is wired.
+`generateItinerary` validates the input, clamps `planCount`, calls the configured provider, validates the JSON against the output schema, and retries once if validation fails.
 
 ## Language
 
-`lang` controls readable text in the plans (`title`, `style`, `why`, place names as returned by the model). JSON keys and fixed codes (`kind`, `transport`) stay in English.
+`lang` controls readable text in the plans (`title`, `style`, `why`, `see`, place names). JSON keys and fixed codes (`kind`, `transport`) stay in English.
 
 ## Output shape
 

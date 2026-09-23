@@ -6,6 +6,8 @@ export type PlanTripEnv = {
   provider: PlanTripProviderName;
   apiKey: string;
   maxPlans: number;
+  /** Optional model override for the selected provider. */
+  model?: string;
 };
 
 function isProviderName(value: string): value is PlanTripProviderName {
@@ -44,9 +46,12 @@ export function readPlanTripEnv(
     maxPlans = parsed;
   }
 
+  const model = env.PLAN_TRIP_MODEL?.trim() || undefined;
+
   return {
     provider: providerRaw,
     apiKey,
     maxPlans,
+    model,
   };
 }
