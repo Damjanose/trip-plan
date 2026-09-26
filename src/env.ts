@@ -8,6 +8,11 @@ export type PlanTripEnv = {
   maxPlans: number;
   /** Optional model override for the selected provider. */
   model?: string;
+  /**
+   * OpenAI-compatible API root (no trailing slash), e.g. https://api.z.ai/api/paas/v4.
+   * Requests go to `${openaiBaseUrl}/chat/completions`.
+   */
+  openaiBaseUrl?: string;
 };
 
 function isProviderName(value: string): value is PlanTripProviderName {
@@ -47,11 +52,14 @@ export function readPlanTripEnv(
   }
 
   const model = env.PLAN_TRIP_MODEL?.trim() || undefined;
+  const openaiBaseUrl =
+    env.PLAN_TRIP_OPENAI_BASE_URL?.trim().replace(/\/$/, "") || undefined;
 
   return {
     provider: providerRaw,
     apiKey,
     maxPlans,
     model,
+    openaiBaseUrl,
   };
 }

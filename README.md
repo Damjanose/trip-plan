@@ -380,11 +380,33 @@ Minimal valid input:
 | `blocks[].kind` | `arrival`, `transfer`, `visit`, `meal`, `rest`, `return`, `departure` |
 | `blocks[].transport` | `walk`, `public`, `taxi`, `car`, `train`, `bus`, `ferry` |
 
+### Travel-guide fields (all optional)
+
+These drive the printed trip guide (day headers, "Trip at a glance" table, transport strategy, practical notes). Older plans without them stay valid.
+
+| Level | Field | Meaning |
+| --- | --- | --- |
+| plan | `subtitle` | Guide label, e.g. "Couple Trip Guide" |
+| plan | `occasion` | Trip-wide occasion line, e.g. "Birthday on the 27th" |
+| plan | `logistics` | `{ arrival, departure, base, nearestTransit }` |
+| plan | `transportTips` | 2–4 bullets: tickets/app, airport ↔ city |
+| plan | `notes` | 3–6 `{ label, text }` practical notes |
+| day | `theme` | 2–5 word label for the summary table |
+| day | `highlight` | The one thing not to miss |
+| day | `occasion` | Set only on the special day, e.g. "Birthday" |
+| block | `details` | How-to line: route, duration, tickets, how long to stay |
+| block | `highlight` | `true` on the standout moments of an occasion |
+
+## Editing a plan
+
+`editItinerary({ plan, instruction, lang, trip? })` revises one existing plan from a free-text change request ("swap the museum on day 2 for a food tour") and resolves to the whole revised plan. It keeps the same number of days (retries once, then throws if the model changes it), changes only what the request needs, and treats the instruction as travel preferences only. Pass the original `trip` input when you have it so unshown preferences (pets, transport) are kept.
+
 ## Public exports
 
 | Export | Use |
 | --- | --- |
 | `generateItinerary` | Main entry |
+| `editItinerary` / `editItineraryInputSchema` | Revise one plan from a change request |
 | `TripInput` / `TripPlans` | Types for callers |
 | `tripInputSchema` / `tripPlansSchema` | Zod schemas if you validate outside |
 | `readPlanTripEnv` | Read env without generating |

@@ -24,11 +24,13 @@ export function readPlanTripEnv(env = process.env) {
         maxPlans = parsed;
     }
     const model = env.PLAN_TRIP_MODEL?.trim() || undefined;
+    const openaiBaseUrl = env.PLAN_TRIP_OPENAI_BASE_URL?.trim().replace(/\/$/, "") || undefined;
     return {
         provider: providerRaw,
         apiKey,
         maxPlans,
         model,
+        openaiBaseUrl,
     };
 }
 //# sourceMappingURL=env.js.map

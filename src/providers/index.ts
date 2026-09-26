@@ -11,10 +11,11 @@ export function getProvider(
   provider: PlanTripProviderName,
   apiKey: string,
   model?: string,
+  openaiBaseUrl?: string,
 ): ItineraryProvider {
   switch (provider) {
     case "openai":
-      return createOpenAIProvider(apiKey, model);
+      return createOpenAIProvider(apiKey, model, openaiBaseUrl);
     case "anthropic":
       return createAnthropicProvider(apiKey, model);
     case "gemini":

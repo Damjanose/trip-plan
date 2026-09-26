@@ -24,6 +24,52 @@ export declare const tripPlansJsonSchema: {
                     readonly style: {
                         readonly type: "string";
                     };
+                    readonly subtitle: {
+                        readonly type: "string";
+                    };
+                    readonly occasion: {
+                        readonly type: "string";
+                    };
+                    readonly logistics: {
+                        readonly type: "object";
+                        readonly additionalProperties: false;
+                        readonly properties: {
+                            readonly arrival: {
+                                readonly type: "string";
+                            };
+                            readonly departure: {
+                                readonly type: "string";
+                            };
+                            readonly base: {
+                                readonly type: "string";
+                            };
+                            readonly nearestTransit: {
+                                readonly type: "string";
+                            };
+                        };
+                    };
+                    readonly transportTips: {
+                        readonly type: "array";
+                        readonly items: {
+                            readonly type: "string";
+                        };
+                    };
+                    readonly notes: {
+                        readonly type: "array";
+                        readonly items: {
+                            readonly type: "object";
+                            readonly additionalProperties: false;
+                            readonly required: readonly ["label", "text"];
+                            readonly properties: {
+                                readonly label: {
+                                    readonly type: "string";
+                                };
+                                readonly text: {
+                                    readonly type: "string";
+                                };
+                            };
+                        };
+                    };
                     readonly days: {
                         readonly type: "array";
                         readonly minItems: 1;
@@ -39,6 +85,15 @@ export declare const tripPlansJsonSchema: {
                                     readonly type: "string";
                                 };
                                 readonly title: {
+                                    readonly type: "string";
+                                };
+                                readonly theme: {
+                                    readonly type: "string";
+                                };
+                                readonly highlight: {
+                                    readonly type: "string";
+                                };
+                                readonly occasion: {
                                     readonly type: "string";
                                 };
                                 readonly blocks: {
@@ -78,6 +133,12 @@ export declare const tripPlansJsonSchema: {
                                                 readonly items: {
                                                     readonly type: "string";
                                                 };
+                                            };
+                                            readonly details: {
+                                                readonly type: "string";
+                                            };
+                                            readonly highlight: {
+                                                readonly type: "boolean";
                                             };
                                         };
                                     };

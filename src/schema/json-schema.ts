@@ -16,6 +16,34 @@ export const tripPlansJsonSchema = {
           base: { type: "string" },
           accommodation: { type: "string" },
           style: { type: "string" },
+          subtitle: { type: "string" },
+          occasion: { type: "string" },
+          logistics: {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              arrival: { type: "string" },
+              departure: { type: "string" },
+              base: { type: "string" },
+              nearestTransit: { type: "string" },
+            },
+          },
+          transportTips: {
+            type: "array",
+            items: { type: "string" },
+          },
+          notes: {
+            type: "array",
+            items: {
+              type: "object",
+              additionalProperties: false,
+              required: ["label", "text"],
+              properties: {
+                label: { type: "string" },
+                text: { type: "string" },
+              },
+            },
+          },
           days: {
             type: "array",
             minItems: 1,
@@ -27,6 +55,9 @@ export const tripPlansJsonSchema = {
                 date: { type: "string" },
                 weekday: { type: "string" },
                 title: { type: "string" },
+                theme: { type: "string" },
+                highlight: { type: "string" },
+                occasion: { type: "string" },
                 blocks: {
                   type: "array",
                   minItems: 1,
@@ -68,6 +99,8 @@ export const tripPlansJsonSchema = {
                         type: "array",
                         items: { type: "string" },
                       },
+                      details: { type: "string" },
+                      highlight: { type: "boolean" },
                     },
                   },
                 },
